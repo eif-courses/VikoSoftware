@@ -32,6 +32,23 @@ public class ApplicationDbContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
         
+        var ulidConverter = new UlidValueConverter();
+
+        // Apply Ulid conversion globally
+        foreach (var entity in modelBuilder.Model.GetEntityTypes())
+        {
+            var properties = entity.ClrType.GetProperties()
+                .Where(p => p.PropertyType == typeof(Ulid));
+            foreach (var property in properties)
+            {
+                modelBuilder.Entity(entity.ClrType)
+                    .Property(property.Name)
+                    .HasConversion(ulidConverter);
+            }
+        }
+
+        
+        
         modelBuilder.Entity<SubjectTypeEntity>()
             .HasOne(st => st.CategoryEntity)
             .WithMany(c => c.SubjectTypes)
@@ -91,11 +108,6 @@ public class ApplicationDbContext : DbContext
             .HasOne(a => a.ActivityCategoryEntity)
             .WithMany()
             .HasForeignKey(a => a.ActivityCategoryEntityId);
-        
-        modelBuilder.Entity<StudyPlanEntity>()
-            .HasOne(a => a.DepartmentEntity)
-            .WithMany()
-            .HasForeignKey(a => a.DepartmentEntityId);
         
     }
     
