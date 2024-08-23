@@ -1,6 +1,8 @@
-﻿namespace StudyPlanner.Features.Faculty.Create;
+﻿using FastEndpoints;
 
-public class Endpoint
+namespace StudyPlanner.Features.Faculty.Create;
+
+internal sealed class Endpoint : Endpoint<Request, Response, Mapper>
 {
     
 }

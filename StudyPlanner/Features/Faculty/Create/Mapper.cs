@@ -1,6 +1,10 @@
-﻿namespace StudyPlanner.Features.Faculty.Create;
+﻿using FastEndpoints;
+using StudyPlanner.Entities;
 
-public class Mapper
+namespace StudyPlanner.Features.Faculty.Create;
+
+
+internal sealed class Mapper : Mapper<Request, Response, FacultyEntity>
 {
     
 }

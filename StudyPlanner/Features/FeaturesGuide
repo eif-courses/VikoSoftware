@@ -1,0 +1,7 @@
+Role power from 1 to n
+
+1. Admin - Control everything
+2. Deputy - Control all faculties info
+3. Faculty - Vice Dean control single faculty 
+4. Department - Head of Department control flow of lecturer Card making
+5. Lecturer - Fills Lecturer card with activities and other mandatory information

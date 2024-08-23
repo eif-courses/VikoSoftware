@@ -1,6 +1,6 @@
 ﻿namespace StudyPlanner.Entities;
 
-public class StudyFormEntity
+public class StudyFormEntity : BaseEntity
 {
-    
+    public string Name { get; set; }
 }

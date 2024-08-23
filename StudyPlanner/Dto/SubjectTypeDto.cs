@@ -1,3 +1,7 @@
 ﻿namespace StudyPlanner.Dto;
 
-public record SubjectTypeDto();
+public class SubjectTypeDto
+{
+    public string Name { get; set; }
+    public List<SubjectDto> Subjects { get; set; } = new List<SubjectDto>();
+}

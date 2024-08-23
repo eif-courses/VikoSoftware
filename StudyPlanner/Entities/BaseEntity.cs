@@ -1,5 +1,5 @@
 ﻿
-namespace StudyPlanner.Shared.Entities;
+namespace StudyPlanner.Entities;
 
 public abstract class BaseEntity
 {

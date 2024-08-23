@@ -1,6 +1,6 @@
-﻿namespace StudyPlanner.Features.Admin.Category.Create;
+﻿using StudyPlanner.Dto;
 
-public class Models
-{
-    
-}
+namespace StudyPlanner.Features.Admin.Category.Create;
+
+internal sealed record Request(CategoryDto CategoryDto);
+internal sealed record Response(string Message);

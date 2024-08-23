@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 
-namespace StudyPlanner.Shared.Data;
+namespace StudyPlanner.Data;
 
 public class ApplicationUser : IdentityUser
 {

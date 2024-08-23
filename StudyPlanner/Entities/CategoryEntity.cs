@@ -1,7 +1,7 @@
-﻿namespace StudyPlanner.Shared.Entities;
+﻿namespace StudyPlanner.Entities;
 
-public class Category : BaseEntity
+public class CategoryEntity : BaseEntity
 {
     public string Title { get; set; }
-    public ICollection<SubjectType> SubjectTypes { get; set; } = new List<SubjectType>();
+    public ICollection<SubjectTypeEntity> SubjectTypes { get; set; } = new List<SubjectTypeEntity>();
 }

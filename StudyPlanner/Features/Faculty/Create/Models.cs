@@ -1,6 +1,5 @@
 ﻿namespace StudyPlanner.Features.Faculty.Create;
 
-public class Models
-{
-    
-}
+using StudyPlanner.Entities;
+internal sealed record Request(FacultyEntity CategoryDto);
+internal sealed record Response(string Message);
