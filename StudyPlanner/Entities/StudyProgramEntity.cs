@@ -1,6 +1,11 @@
-﻿namespace StudyPlanner.Entities;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 
-public class StudyProgramEntity : BaseEntity
+namespace StudyPlanner.Entities;
+
+public class StudyProgramEntity
 {
+    
+    [Column(TypeName = "varchar(255)")]
+    public Ulid Id { get; set; }
     public string Name { get; set; }
 }

@@ -11,6 +11,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
     options.UseSqlite($"Data Source={nameof(ApplicationDbContext.ApplicationDatabase)}.db");
 });
+builder.Services.AddScoped<ApplicationDbContext>(); // Add this line
 
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>()

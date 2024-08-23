@@ -1,10 +1,16 @@
-﻿namespace StudyPlanner.Entities;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 
-public class NonContactHoursEntity : BaseEntity
+namespace StudyPlanner.Entities;
+
+public class NonContactHoursEntity
 {
+    [Column(TypeName = "varchar(255)")]
+    public Ulid Id { get; set; }
     
+    [Column(TypeName = "varchar(255)")]
     public Ulid NonContactHoursDetailsEntityId { get; set; }
     public NonContactHoursDetailsEntity NonContactHoursDetailsEntity { get; set; }
+    [Column(TypeName = "varchar(255)")]
     public Ulid SubjectEntityId { get; set; }
     public SubjectEntity SubjectEntity { get; set; }
 }

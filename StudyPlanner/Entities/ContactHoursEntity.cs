@@ -1,7 +1,12 @@
-﻿namespace StudyPlanner.Entities;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 
-public class ContactHoursEntity : BaseEntity
+namespace StudyPlanner.Entities;
+
+public class ContactHoursEntity 
 {
+    
+    [Column(TypeName = "varchar(255)")]
+    public Ulid Id { get; set; }
     public int LectureHours { get; set; }
     public int PracticeHours { get; set; }
     public int? RemoteLectureHours { get; set; }
@@ -9,8 +14,10 @@ public class ContactHoursEntity : BaseEntity
     public int SelfStudyHours { get; set; }
     public string Notes { get; set; }
     
+    [Column(TypeName = "varchar(255)")]
     public Ulid ContactHoursDetailsEntityId { get; set; }
     public ContactHoursDetailsEntity ContactHoursDetailsEntity { get; set; }
+    [Column(TypeName = "varchar(255)")]
     public Ulid SubjectEntityId { get; set; }
     public SubjectEntity SubjectEntity { get; set; }
 }

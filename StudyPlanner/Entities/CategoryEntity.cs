@@ -1,7 +1,11 @@
-﻿namespace StudyPlanner.Entities;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 
-public class CategoryEntity : BaseEntity
+namespace StudyPlanner.Entities;
+
+public class CategoryEntity
 {
+    [Column(TypeName = "varchar(255)")]
+    public Ulid Id { get; set; }
     public string Title { get; set; }
     public ICollection<SubjectTypeEntity> SubjectTypes { get; set; } = new List<SubjectTypeEntity>();
 }

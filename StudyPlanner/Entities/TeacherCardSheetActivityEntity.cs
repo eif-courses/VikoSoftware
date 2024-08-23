@@ -1,11 +1,18 @@
-﻿namespace StudyPlanner.Entities;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 
-public class TeacherCardSheetActivityEntity : BaseEntity
+namespace StudyPlanner.Entities;
+
+public class TeacherCardSheetActivityEntity
 {
+    
+    [Column(TypeName = "varchar(255)")]
+    public Ulid Id { get; set; }
     private int _hoursSpent;
 
+    [Column(TypeName = "varchar(255)")]
     public Ulid TeacherCardSheetEntityId { get; set; }
     public TeacherCardSheetEntity TeacherCardSheetEntity { get; set; }
+    [Column(TypeName = "varchar(255)")]
     public Ulid ActivityEntityId { get; set; }
     public ActivityEntity ActivityEntity { get; set; }
 

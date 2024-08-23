@@ -1,6 +1,10 @@
-﻿namespace StudyPlanner.Entities;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 
-public class ActivityCategoryEntity : BaseEntity
+namespace StudyPlanner.Entities;
+
+public class ActivityCategoryEntity
 {
+    [Column(TypeName = "varchar(255)")]
+    public Ulid Id { get; set; }
     public string Title { get; set; } = string.Empty;
 }

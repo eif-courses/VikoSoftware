@@ -1,11 +1,11 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Namotion.Reflection;
 using StudyPlanner.Entities;
 
 namespace StudyPlanner.Data;
 
-public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
-    : IdentityDbContext<ApplicationUser>(options)
+public class ApplicationDbContext : DbContext
 {
     public static readonly string ApplicationDatabase = nameof(ApplicationDatabase).ToLower();
 
@@ -31,13 +31,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
-
-        modelBuilder.Entity<BaseEntity>()
-            .Property(e => e.Id)
-            .HasConversion(
-                v => v.ToString(),
-                v => Ulid.Parse(v.ToString()));
-
+        
         modelBuilder.Entity<SubjectTypeEntity>()
             .HasOne(st => st.CategoryEntity)
             .WithMany(c => c.SubjectTypes)
@@ -97,5 +91,19 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
             .HasOne(a => a.ActivityCategoryEntity)
             .WithMany()
             .HasForeignKey(a => a.ActivityCategoryEntityId);
+        
+        modelBuilder.Entity<StudyPlanEntity>()
+            .HasOne(a => a.DepartmentEntity)
+            .WithMany()
+            .HasForeignKey(a => a.DepartmentEntityId);
+        
+    }
+    
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        if (!optionsBuilder.IsConfigured)
+        {
+            optionsBuilder.UseSqlite($"Data Source={ApplicationDatabase}.db");
+        }
     }
 }
