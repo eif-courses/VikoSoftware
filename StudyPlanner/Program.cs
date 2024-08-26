@@ -42,11 +42,21 @@ builder.Services.AddAuthentication();
 //     }).AddIdentityCookies();
 //
 
-
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowSpecificOrigin",
+        opt => opt
+            .WithOrigins("http://localhost:3000") // Change this to match your frontend's origin
+            .AllowAnyHeader()
+            .AllowAnyMethod());
+});
 
 builder.Services.AddFastEndpoints().SwaggerDocument();
 
 var app = builder.Build();
+
+
+app.UseCors("AllowSpecificOrigin");
 
 app.UseFastEndpoints().UseSwaggerGen();
 

@@ -5,7 +5,7 @@ namespace StudyPlanner.Entities;
 public class ActivityEntity
 {
     [Column(TypeName = "varchar(255)")]
-    public Ulid Id { get; set; }
+    public Ulid Id { get; set; } = Ulid.NewUlid();
     
     public string Identifier { get; set; }
     public string Title { get; set; }

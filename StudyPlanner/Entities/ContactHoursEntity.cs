@@ -6,7 +6,7 @@ public class ContactHoursEntity
 {
     
     [Column(TypeName = "varchar(255)")]
-    public Ulid Id { get; set; }
+    public Ulid Id { get; set; }  = Ulid.NewUlid();
     public int LectureHours { get; set; }
     public int PracticeHours { get; set; }
     public int? RemoteLectureHours { get; set; }

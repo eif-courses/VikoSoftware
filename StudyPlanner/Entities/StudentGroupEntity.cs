@@ -6,7 +6,7 @@ public class StudentGroupEntity
 {
     
     [Column(TypeName = "varchar(255)")]
-    public Ulid Id { get; set; }
+    public Ulid Id { get; set; }  = Ulid.NewUlid();
     public string Name { get; set; }
     public int Semester { get; set; }
     public int StudentNumber { get; set; }

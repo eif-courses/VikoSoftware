@@ -6,6 +6,6 @@ public class StudyFormEntity
 {
     
     [Column(TypeName = "varchar(255)")]
-    public Ulid Id { get; set; }
+    public Ulid Id { get; set; }  = Ulid.NewUlid();
     public string Name { get; set; }
 }

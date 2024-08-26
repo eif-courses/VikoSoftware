@@ -5,7 +5,7 @@ namespace StudyPlanner.Entities;
 public class NonContactHoursDetailsEntity
 {
     [Column(TypeName = "varchar(255)")]
-    public Ulid Id { get; set; }
+    public Ulid Id { get; set; }  = Ulid.NewUlid();
     public int GradingNumberCount { get; set; }
     public int GradingHours { get; set; }
     public int OtherCount { get; set; }

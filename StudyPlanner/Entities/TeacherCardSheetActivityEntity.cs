@@ -6,7 +6,7 @@ public class TeacherCardSheetActivityEntity
 {
     
     [Column(TypeName = "varchar(255)")]
-    public Ulid Id { get; set; }
+    public Ulid Id { get; set; }  = Ulid.NewUlid();
     private int _hoursSpent;
 
     [Column(TypeName = "varchar(255)")]

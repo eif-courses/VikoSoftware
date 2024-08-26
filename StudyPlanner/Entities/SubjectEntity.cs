@@ -5,7 +5,7 @@ public class SubjectEntity
 {
     
     [Column(TypeName = "varchar(255)")]
-    public Ulid Id { get; set; }
+    public Ulid Id { get; set; }  = Ulid.NewUlid();
     public string Title { get; set; }
     public int Credits { get; set; }
     public int Semester { get; set; }
