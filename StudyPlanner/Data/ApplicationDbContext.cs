@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Namotion.Reflection;
 using StudyPlanner.Entities;
@@ -7,10 +8,11 @@ namespace StudyPlanner.Data;
 
 public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
 {
-    
-    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options): base(options){}
-    
-    
+    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
+    {
+    }
+
+
     public static readonly string ApplicationDatabase = nameof(ApplicationDatabase).ToLower();
 
     public DbSet<CategoryEntity> Categories { get; set; }
@@ -35,6 +37,14 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+
+        modelBuilder.Entity<IdentityRole>().HasData(
+            new IdentityRole { Id = "1", Name = "Admin", NormalizedName = "ADMIN" },
+            new IdentityRole { Id = "2", Name = "Deputy", NormalizedName = "DEPUTY" },
+            new IdentityRole { Id = "3", Name = "Lecturer", NormalizedName = "LECTURER" },
+            new IdentityRole { Id = "4", Name = "Faculty", NormalizedName = "FACULTY" },
+            new IdentityRole { Id = "5", Name = "Department", NormalizedName = "DEPARTMENT" }
+        );
         
         var ulidConverter = new UlidValueConverter();
 
@@ -51,8 +61,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
             }
         }
 
-        
-        
+
         modelBuilder.Entity<SubjectTypeEntity>()
             .HasOne(st => st.CategoryEntity)
             .WithMany(c => c.SubjectTypes)
@@ -112,9 +121,8 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
             .HasOne(a => a.ActivityCategoryEntity)
             .WithMany()
             .HasForeignKey(a => a.ActivityCategoryEntityId);
-        
     }
-    
+
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         if (!optionsBuilder.IsConfigured)
