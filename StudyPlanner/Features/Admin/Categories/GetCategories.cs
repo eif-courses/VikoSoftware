@@ -17,13 +17,18 @@ internal sealed class GetCategories(ApplicationDbContext dbContext) : EndpointWi
     public override void Configure()
     {
         Get("/admin/categories");
-        AllowAnonymous();
+        Roles("Lecturer");
     }
 
     public override async Task HandleAsync(CancellationToken c)
     {
-        var categories = await dbContext.Categories
-            .ToListAsync(c);
+        if (!User.Identity.IsAuthenticated || !User.IsInRole("Lecturer"))
+        {
+            await SendUnauthorizedAsync(c);
+            return;
+        }
+
+        var categories = await dbContext.Categories.ToListAsync(c);
         
         var response = new GetCategoriesResponse
         {
