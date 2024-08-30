@@ -1,4 +1,7 @@
-﻿using FastEndpoints;
+﻿using System.Net;
+using FastEndpoints;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using StudyPlanner.Data;
 using StudyPlanner.Entities;
@@ -12,21 +15,22 @@ internal sealed class GetCategoriesResponse
 
 }
 
+
 internal sealed class GetCategories(ApplicationDbContext dbContext) : EndpointWithoutRequest<GetCategoriesResponse>
 {
     public override void Configure()
     {
         Get("/admin/categories");
-        Roles("Lecturer");
+        AuthSchemes(JwtBearerDefaults.AuthenticationScheme);
     }
 
     public override async Task HandleAsync(CancellationToken c)
     {
-        if (!User.Identity.IsAuthenticated || !User.IsInRole("Lecturer"))
-        {
-            await SendUnauthorizedAsync(c);
-            return;
-        }
+        // if (!User.Identity.IsAuthenticated || !User.IsInRole("Lecturer"))
+        // {
+        //     await SendUnauthorizedAsync(c);
+        //     return;
+        // }
 
         var categories = await dbContext.Categories.ToListAsync(c);
         

@@ -27,9 +27,6 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
 
-
-// https://simuluthaudit.onmicrosoft.com/88142313-86bc-4399-99e8-390e3a07ce99
-// https://simuluthaudit.onmicrosoft.com/88142313-86bc-4399-99e8-390e3a07ce99/viko
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddMicrosoftIdentityWebApi(builder.Configuration.GetSection("AzureAd"));
 
