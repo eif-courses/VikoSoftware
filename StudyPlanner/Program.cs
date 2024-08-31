@@ -13,27 +13,31 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlite($"Data Source={nameof(ApplicationDbContext.ApplicationDatabase)}.db");
 });
 
-builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
-    {
-        options.Password.RequireDigit = true;
-        options.Password.RequireLowercase = true;
-        options.Password.RequireUppercase = true;
-        options.Password.RequireNonAlphanumeric = true;
-        options.Password.RequiredLength = 6;
-        options.Password.RequiredUniqueChars = 1;
-        options.User.RequireUniqueEmail = true;
-        options.SignIn.RequireConfirmedAccount = false;
-    })
-    .AddEntityFrameworkStores<ApplicationDbContext>()
-    .AddDefaultTokenProviders();
+// Default Identity Api Endpoints only .NET 8+
+builder.Services.AddIdentityApiEndpoints<ApplicationUser>()
+    .AddRoles<IdentityRole>()
+    .AddEntityFrameworkStores<ApplicationDbContext>();
 
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+builder.Services.AddAuthentication(options => {  options.DefaultScheme = "Identity.BearerAndApplication";})
     .AddMicrosoftIdentityWebApi(builder.Configuration.GetSection("AzureAd"));
+
 
 builder.Services.AddAuthorization(options =>
 {
-    options.AddPolicy("LecturerPolicy", policy => policy.RequireRole("Lecturer"));
+    options.AddPolicy("AdminPolicy", policy =>
+    {
+        policy.RequireAssertion(context =>
+        {
+            var claims = context.User.Claims;
+            return claims.Any(c =>
+                c.Type == "http://schemas.microsoft.com/ws/2008/06/identity/claims/role" && c.Value == "Admin");
+        });
+    });
 });
+// builder.Services.AddAuthorization(options =>
+// {
+//     options.AddPolicy("LecturerPolicy", policy => policy.RequireRole("Lecturer"));
+// });
 
 
 builder.Services.AddCors(options =>
@@ -51,6 +55,9 @@ var app = builder.Build();
 
 app.UseHttpsRedirection();
 app.UseCors("AllowSpecificOrigin");
+
+app.MapIdentityApi<ApplicationUser>();
+
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseDefaultExceptionHandler();

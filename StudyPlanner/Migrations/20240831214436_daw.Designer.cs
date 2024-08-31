@@ -11,8 +11,8 @@ using StudyPlanner.Data;
 namespace StudyPlanner.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240827071526_identiy_added")]
-    partial class identiy_added
+    [Migration("20240831214436_daw")]
+    partial class daw
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -44,6 +44,38 @@ namespace StudyPlanner.Migrations
                         .HasDatabaseName("RoleNameIndex");
 
                     b.ToTable("AspNetRoles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "1",
+                            Name = "Admin",
+                            NormalizedName = "ADMIN"
+                        },
+                        new
+                        {
+                            Id = "2",
+                            Name = "Deputy",
+                            NormalizedName = "DEPUTY"
+                        },
+                        new
+                        {
+                            Id = "3",
+                            Name = "Lecturer",
+                            NormalizedName = "LECTURER"
+                        },
+                        new
+                        {
+                            Id = "4",
+                            Name = "Faculty",
+                            NormalizedName = "FACULTY"
+                        },
+                        new
+                        {
+                            Id = "5",
+                            Name = "Department",
+                            NormalizedName = "DEPARTMENT"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -166,6 +198,9 @@ namespace StudyPlanner.Migrations
 
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("INTEGER");
+
+                    b.Property<string>("FullName")
+                        .HasColumnType("TEXT");
 
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("INTEGER");
