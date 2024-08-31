@@ -1,8 +1,7 @@
 ﻿using StudyPlanner.Data;
-using StudyPlanner.Dto;
 using StudyPlanner.Features.Admin.Categories;
 
-namespace StudyPlanner.Features.StudyPlans;
+namespace StudyPlanner.Features.StudyPrograms;
 
 
 using FastEndpoints;

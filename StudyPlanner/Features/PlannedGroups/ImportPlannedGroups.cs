@@ -1,11 +1,11 @@
 ﻿using StudyPlanner.Data;
 using StudyPlanner.Dto;
 using StudyPlanner.Features.Admin.Categories;
-
-namespace StudyPlanner.Features.StudyPlans;
-
-
 using FastEndpoints;
+namespace StudyPlanner.Features.PlannedGroups;
+
+
+
 
 // internal sealed record CreateCategoryRequest(CategoryDto CategoryDto);
 // internal sealed record CreateCategoryResponse(string Message);
@@ -13,7 +13,7 @@ internal sealed class ImportPlannedGroups(ApplicationDbContext dbContext) : Endp
 {
     public override void Configure()
     {
-        Post("/study-programs/import");
+        Post("/planned-groups/import");
         AllowAnonymous();
     }
 
