@@ -28,10 +28,8 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Features\Department\" />
-      <Folder Include="Features\Deputy\" />
-      <Folder Include="Features\Faculty\" />
-      <Folder Include="Features\Lecturer\" />
+      <Folder Include="Features\Admin\Importer\" />
+      <Folder Include="Features\StudyPlans\Reports\" />
     </ItemGroup>
 
 </Project>

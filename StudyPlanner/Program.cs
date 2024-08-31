@@ -53,6 +53,7 @@ app.UseHttpsRedirection();
 app.UseCors("AllowSpecificOrigin");
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseDefaultExceptionHandler();
 app.UseFastEndpoints().UseSwaggerGen();
 
 

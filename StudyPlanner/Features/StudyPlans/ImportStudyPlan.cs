@@ -2,18 +2,18 @@
 using StudyPlanner.Dto;
 using StudyPlanner.Features.Admin.Categories;
 
-namespace StudyPlanner.Features.Admin.Importer;
+namespace StudyPlanner.Features.StudyPlans;
 
 
 using FastEndpoints;
 
 // internal sealed record CreateCategoryRequest(CategoryDto CategoryDto);
 // internal sealed record CreateCategoryResponse(string Message);
-internal sealed class CreateCategory(ApplicationDbContext dbContext) : Endpoint<CreateCategoryRequest, CreateCategoryResponse>
+internal sealed class ImportStudyPlan(ApplicationDbContext dbContext) : Endpoint<CreateCategoryRequest, CreateCategoryResponse>
 {
     public override void Configure()
     {
-        Post("/admin/importer");
+        Post("/study-plans/import");
         AllowAnonymous();
     }
 
