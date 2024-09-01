@@ -18,7 +18,7 @@ builder.Services.AddIdentityApiEndpoints<ApplicationUser>()
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
 
-builder.Services.AddAuthentication(options => {  options.DefaultScheme = "Identity.BearerAndApplication";})
+builder.Services.AddAuthentication(options => { options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme; })
     .AddMicrosoftIdentityWebApi(builder.Configuration.GetSection("AzureAd"));
 
 
