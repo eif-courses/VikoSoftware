@@ -1,32 +1,47 @@
-﻿using StudyPlanner.Data;
-using StudyPlanner.Dto;
-using StudyPlanner.Features.Admin.Categories;
+﻿using OfficeOpenXml;
+using StudyPlanner.Data;
+
 
 namespace StudyPlanner.Features.StudyPlans;
 
 
 using FastEndpoints;
 
-// internal sealed record CreateCategoryRequest(CategoryDto CategoryDto);
+ internal sealed record StudyPlanExcelFileRequest(IFormFile file);
 // internal sealed record CreateCategoryResponse(string Message);
-internal sealed class ImportStudyPlan(ApplicationDbContext dbContext) : Endpoint<CreateCategoryRequest, CreateCategoryResponse>
+internal sealed class ImportStudyPlan(ApplicationDbContext dbContext) : Endpoint<StudyPlanExcelFileRequest>
 {
     public override void Configure()
     {
-        Post("/study-plans/import");
+        Post("study-plans/import");
+        AllowFileUploads();
         AllowAnonymous();
     }
 
-    public override async Task HandleAsync(CreateCategoryRequest r, CancellationToken c)
+    public override async Task HandleAsync(StudyPlanExcelFileRequest r, CancellationToken ct)
     {
-        //var category = Map.ToEntity(r);
-        
-        // dbContext.Categories.Add(category);
-        // await dbContext.SaveChangesAsync(c);
-        //
-        // var response = new CreateCategoryResponse($"Kategorija {category.Title} sėkmingai sukurtas!");
-        //
-        // await SendAsync(response,200, c);
+        // Check if the file is present and not empty
+        if (r.file == null || r.file.Length == 0)
+        {
+            await SendErrorsAsync(400, ct);
+            return;
+        }
+
+        using var stream = new MemoryStream();
+        await r.file.CopyToAsync(stream, ct);
+        stream.Position = 0;
+
+        using var package = new ExcelPackage(stream);
+        var worksheet = package.Workbook.Worksheets[0]; // Assuming the first worksheet
+
+        var subjects = new List<string>();
+        for (int row = 7; row <= worksheet.Dimension.End.Row; row++) // Start from row 7, as you intended
+        {
+            subjects.Add(worksheet.Cells[row, 4].Value?.ToString());
+        }
+
+        // Returning the list of subjects as a response
+        await SendOkAsync(subjects, ct);
     }
 }
 
