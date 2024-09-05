@@ -1,6 +1,5 @@
 using FastEndpoints;
 using FastEndpoints.Swagger;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Web;
@@ -18,9 +17,10 @@ builder.Services.AddIdentityApiEndpoints<ApplicationUser>()
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
 
-builder.Services.AddAuthentication(options => { options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme; })
-    .AddMicrosoftIdentityWebApi(builder.Configuration.GetSection("AzureAd"));
 
+// WRONG SCHEMA CHOSEN DO NOT ADD AddAuthentication any default schema
+// Because default local sign in uses Cookies transform to tokens BUT not to JWT tokens :)
+builder.Services.AddAuthentication().AddMicrosoftIdentityWebApi(builder.Configuration.GetSection("AzureAd"));
 
 builder.Services.AddAuthorization(options =>
 {
@@ -56,12 +56,12 @@ var app = builder.Build();
 app.UseHttpsRedirection();
 app.UseCors("AllowSpecificOrigin");
 
-app.MapIdentityApi<ApplicationUser>();
+
+app.MapGroup("/auth").MapIdentityApi<ApplicationUser>();
 
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseDefaultExceptionHandler();
 app.UseFastEndpoints().UseSwaggerGen();
-
 
 app.Run();
