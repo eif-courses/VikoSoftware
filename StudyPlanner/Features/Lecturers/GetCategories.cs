@@ -17,6 +17,7 @@ internal sealed class GetCategoriesResponse
 }
 
 
+
 internal sealed class GetCategories(ApplicationDbContext dbContext) : EndpointWithoutRequest<GetCategoriesResponse>
 {
     public override void Configure()
@@ -24,6 +25,7 @@ internal sealed class GetCategories(ApplicationDbContext dbContext) : EndpointWi
         Get("/lecturers/categories");
         AuthSchemes(JwtBearerDefaults.AuthenticationScheme);
         
+        //AllowAnonymous();
         // {
         //     "email": "eif@viko.lt",
         //     "password": "Kolegija1@"
@@ -42,16 +44,16 @@ internal sealed class GetCategories(ApplicationDbContext dbContext) : EndpointWi
         // }
 
         // Extract the preferred_username from the JWT token
-        var preferredUsername = User.Claims.FirstOrDefault(claim => claim.Type == "preferred_username")?.Value;
-
-        if (string.IsNullOrEmpty(preferredUsername))
-        {
-            await SendUnauthorizedAsync(c);
-            return;
-        }
-
-        // Log or use the preferred_username as needed
-        Console.WriteLine($"Authenticated user preferred username: {preferredUsername}");
+        // var preferredUsername = User.Claims.FirstOrDefault(claim => claim.Type == "preferred_username")?.Value;
+        //
+        // if (string.IsNullOrEmpty(preferredUsername))
+        // {
+        //     await SendUnauthorizedAsync(c);
+        //     return;
+        // }
+        //
+        // // Log or use the preferred_username as needed
+        // Console.WriteLine($"Authenticated user preferred username: {preferredUsername}");
 
         // Fetch categories from the database
         var categories = await dbContext.Categories.ToListAsync(c);

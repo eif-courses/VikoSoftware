@@ -1,4 +1,5 @@
 using FastEndpoints;
+using FastEndpoints.Security;
 using FastEndpoints.Swagger;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -12,32 +13,19 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlite($"Data Source={nameof(ApplicationDbContext.ApplicationDatabase)}.db");
 });
 
-// Default Identity Api Endpoints only .NET 8+
-builder.Services.AddIdentityApiEndpoints<ApplicationUser>()
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
     .AddRoles<IdentityRole>()
-    .AddEntityFrameworkStores<ApplicationDbContext>();
+    .AddEntityFrameworkStores<ApplicationDbContext>()
+    .AddDefaultTokenProviders(); // Optional, if you still need token providers for things like email confirmation
 
 
-// WRONG SCHEMA CHOSEN DO NOT ADD AddAuthentication any default schema
-// Because default local sign in uses Cookies transform to tokens BUT not to JWT tokens :)
+// LOCAL AUTHENTICATION FAST ENDPOINTS SECURITY PACKAGE
+builder.Services.AddAuthenticationCookie(validFor: TimeSpan.FromMinutes(30));
+
+// MICROSOFT AUTHENTICATION
 builder.Services.AddAuthentication().AddMicrosoftIdentityWebApi(builder.Configuration.GetSection("AzureAd"));
 
-builder.Services.AddAuthorization(options =>
-{
-    options.AddPolicy("AdminPolicy", policy =>
-    {
-        policy.RequireAssertion(context =>
-        {
-            var claims = context.User.Claims;
-            return claims.Any(c =>
-                c.Type == "http://schemas.microsoft.com/ws/2008/06/identity/claims/role" && c.Value == "Admin");
-        });
-    });
-});
-// builder.Services.AddAuthorization(options =>
-// {
-//     options.AddPolicy("LecturerPolicy", policy => policy.RequireRole("Lecturer"));
-// });
+builder.Services.AddAuthorization();
 
 
 builder.Services.AddCors(options =>
@@ -55,9 +43,6 @@ var app = builder.Build();
 
 app.UseHttpsRedirection();
 app.UseCors("AllowSpecificOrigin");
-
-
-app.MapGroup("/auth").MapIdentityApi<ApplicationUser>();
 
 app.UseAuthentication();
 app.UseAuthorization();
