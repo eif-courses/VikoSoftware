@@ -6,20 +6,22 @@ using StudyPlanner.Data;
 
 namespace StudyPlanner.Features.Auth;
 
-internal sealed record SignInRequest(string Email, string Password);
+public sealed record SignInRequest(string Email, string Password);
 
-internal sealed class SignIn: Endpoint<SignInRequest> 
+internal sealed class SignIn : Endpoint<SignInRequest>
 {
     private readonly UserManager<ApplicationUser> _userManager;
+    private readonly SignInManager<ApplicationUser> _signInManager;
 
-    public SignIn(UserManager<ApplicationUser> userManager)
+    public SignIn(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager)
     {
         _userManager = userManager;
+        _signInManager = signInManager;
     }
 
     public override void Configure()
     {
-        Post("/auth/signin");
+        Post("/auth/mfa/signin");
         AllowAnonymous();
     }
 
@@ -32,24 +34,38 @@ internal sealed class SignIn: Endpoint<SignInRequest>
             return;
         }
 
+        // Check if 2FA is enabled for this user
+        if (await _userManager.GetTwoFactorEnabledAsync(user))
+        {
+            // Indicate that 2FA is required and send a temporary 2FA token
+            // You can return a response with a 2FA-required status
+            await SendAsync(new { message = "2FA required", userId = user.Id }, statusCode: 200, ct);
+            return;
+        }
+
+        // No 2FA required, sign in the user with cookies
+        await SignInUser(user);
+        await SendOkAsync(ct);
+    }
+
+    private async Task SignInUser(ApplicationUser user)
+    {
         // Get user roles and create claims
         var roles = await _userManager.GetRolesAsync(user);
         var claims = new List<Claim>
         {
             new Claim(ClaimTypes.Name, user.UserName),
-            new Claim(ClaimTypes.Email, req.Email)
+            new Claim(ClaimTypes.Email, user.Email),
+            new Claim(ClaimTypes.NameIdentifier, user.Id)
         };
 
         claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
 
-        // Create and sign in the user
+        // Create and sign in the user using cookie authentication
         await CookieAuth.SignInAsync(u =>
         {
             u.Claims.AddRange(claims);
             u.Roles.AddRange(roles);
         });
-
-        await SendOkAsync(ct);
-    
     }
 }

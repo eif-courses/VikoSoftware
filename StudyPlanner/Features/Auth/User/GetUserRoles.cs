@@ -1,8 +1,6 @@
 ﻿using System.Security.Claims;
 using FastEndpoints;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authorization;
 
 namespace StudyPlanner.Features.Auth.User;
 
