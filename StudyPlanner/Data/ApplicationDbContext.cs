@@ -124,11 +124,24 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        if (!optionsBuilder.IsConfigured)
+        // Determine the environment
+        var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+        var isDevelopment = string.Equals(environment, "Development", StringComparison.OrdinalIgnoreCase);
+
+        if (isDevelopment)
         {
-            // optionsBuilder.UseSqlite($"Data Source={ApplicationDatabase}.db");
+            // Development configuration
+            var connectionString = configuration.GetConnectionString("DefaultConnection");
+            optionsBuilder.UseNpgsql(connectionString);
+        }
+        else
+        {
+            // Production configuration
             var connectionString = Environment.GetEnvironmentVariable("CONNECTION_STRING");
-            //var connectionString = configuration.GetConnectionString("DefaultConnection");
+            if (string.IsNullOrEmpty(connectionString))
+            {
+                throw new InvalidOperationException("The CONNECTION_STRING environment variable is not set.");
+            }
             optionsBuilder.UseNpgsql(connectionString);
         }
     }

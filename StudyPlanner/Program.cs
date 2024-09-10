@@ -9,20 +9,15 @@ using StudyPlanner.Data;
 var builder = WebApplication.CreateBuilder(args);
 
 
+string connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
-
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
+if (!builder.Environment.IsDevelopment())
 {
-    //options.UseSqlite($"Data Source={nameof(ApplicationDbContext.ApplicationDatabase)}.db");
-    
-    var connectionString = Environment.GetEnvironmentVariable("CONNECTION_STRING");
-    
-    
-    
-    // Production DB
-    options.UseNpgsql(connectionString);
+    connectionString = Environment.GetEnvironmentVariable("CONNECTION_STRING");
+}
 
-});
+builder.Services.AddDbContext<ApplicationDbContext>(options => { options.UseNpgsql(connectionString); });
+
 
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
     .AddRoles<IdentityRole>()
@@ -80,3 +75,6 @@ app.UseDefaultExceptionHandler();
 app.UseFastEndpoints().UseSwaggerGen();
 
 app.Run();
+
+
+// FREE DB POSTGRES : https://cloud.tembo.io/
