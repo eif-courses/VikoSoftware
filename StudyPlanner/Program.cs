@@ -8,12 +8,20 @@ using StudyPlanner.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
+
+EnvReader.Load(".env");
+
+
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
     //options.UseSqlite($"Data Source={nameof(ApplicationDbContext.ApplicationDatabase)}.db");
     
+    var connectionString = Environment.GetEnvironmentVariable("CONNECTION_STRING");
+    
+    
+    
     // Production DB
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
+    options.UseNpgsql(connectionString);
 
 });
 

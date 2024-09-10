@@ -127,8 +127,8 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
         if (!optionsBuilder.IsConfigured)
         {
             // optionsBuilder.UseSqlite($"Data Source={ApplicationDatabase}.db");
-
-            var connectionString = configuration.GetConnectionString("DefaultConnection");
+            var connectionString = Environment.GetEnvironmentVariable("CONNECTION_STRING");
+            //var connectionString = configuration.GetConnectionString("DefaultConnection");
             optionsBuilder.UseNpgsql(connectionString);
         }
     }
