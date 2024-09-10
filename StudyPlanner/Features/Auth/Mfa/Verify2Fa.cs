@@ -45,6 +45,7 @@ internal sealed class Verify2Fa(UserManager<ApplicationUser> userManager) : Endp
         }
         
         // Complete the sign-in process
+        //await SendAsync(new { message = "2FA setup complete" }, statusCode: 200, ct);  // JSON success message
         await SignInUser(user);
         await SendOkAsync(ct);
     }

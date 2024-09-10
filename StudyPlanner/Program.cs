@@ -18,10 +18,6 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders(); // Optional, if you still need token providers for things like email confirmation
 
-
-
-
-
 // LOCAL AUTHENTICATION FAST ENDPOINTS SECURITY PACKAGE
 builder.Services.AddAuthenticationCookie(validFor: TimeSpan.FromMinutes(30),
     options =>
@@ -30,13 +26,10 @@ builder.Services.AddAuthenticationCookie(validFor: TimeSpan.FromMinutes(30),
         options.LogoutPath = "/auth/mfa/signout";
     });
 
-
 // MICROSOFT AUTHENTICATION
 builder.Services.AddAuthentication().AddMicrosoftIdentityWebApi(builder.Configuration.GetSection("AzureAd"));
 
 builder.Services.AddAuthorization();
-
-
 
 builder.Services.AddCors(options =>
 {
