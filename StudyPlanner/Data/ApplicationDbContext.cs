@@ -6,14 +6,13 @@ using StudyPlanner.Entities;
 
 namespace StudyPlanner.Data;
 
-public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
+public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options, IConfiguration configuration)
+    : IdentityDbContext<ApplicationUser>(options)
 {
-    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
-    {
-    }
+    //private readonly IConfiguration _configuration = configuration;
 
 
-    public static readonly string ApplicationDatabase = nameof(ApplicationDatabase).ToLower();
+    // public static readonly string ApplicationDatabase = nameof(ApplicationDatabase).ToLower();
 
     public DbSet<CategoryEntity> Categories { get; set; }
     public DbSet<SubjectTypeEntity> SubjectTypes { get; set; }
@@ -45,7 +44,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
             new IdentityRole { Id = "4", Name = "Faculty", NormalizedName = "FACULTY" },
             new IdentityRole { Id = "5", Name = "Department", NormalizedName = "DEPARTMENT" }
         );
-        
+
         var ulidConverter = new UlidValueConverter();
 
         // Apply Ulid conversion globally
@@ -127,7 +126,10 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
         if (!optionsBuilder.IsConfigured)
         {
-            optionsBuilder.UseSqlite($"Data Source={ApplicationDatabase}.db");
+            // optionsBuilder.UseSqlite($"Data Source={ApplicationDatabase}.db");
+
+            var connectionString = configuration.GetConnectionString("DefaultConnection");
+            optionsBuilder.UseNpgsql(connectionString);
         }
     }
 }

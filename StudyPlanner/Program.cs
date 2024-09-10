@@ -10,7 +10,11 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
-    options.UseSqlite($"Data Source={nameof(ApplicationDbContext.ApplicationDatabase)}.db");
+    //options.UseSqlite($"Data Source={nameof(ApplicationDbContext.ApplicationDatabase)}.db");
+    
+    // Production DB
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
+
 });
 
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
@@ -49,6 +53,16 @@ builder.Services.AddCors(options =>
 builder.Services.AddFastEndpoints().SwaggerDocument();
 
 var app = builder.Build();
+
+// Call the method to seed the database
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
+    var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+    await SeedData.Initialize(userManager, roleManager);
+}
+
 
 app.UseHttpsRedirection();
 app.UseCors("AllowSpecificOrigin");
