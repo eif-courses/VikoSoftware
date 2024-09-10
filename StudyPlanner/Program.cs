@@ -9,7 +9,6 @@ using StudyPlanner.Data;
 var builder = WebApplication.CreateBuilder(args);
 
 
-EnvReader.Load(".env");
 
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
