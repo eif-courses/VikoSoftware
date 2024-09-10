@@ -19,11 +19,17 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
     .AddDefaultTokenProviders(); // Optional, if you still need token providers for things like email confirmation
 
 // LOCAL AUTHENTICATION FAST ENDPOINTS SECURITY PACKAGE
+// COokie test dev only disable cross domains SameSite
+//         options.Cookie.SecurePolicy = CookieSecurePolicy.None; ALSO NEED CHANGE
 builder.Services.AddAuthenticationCookie(validFor: TimeSpan.FromMinutes(30),
     options =>
     {
         options.LoginPath = "/auth/mfa/signin";
         options.LogoutPath = "/auth/mfa/signout";
+        options.Cookie.SameSite = SameSiteMode.None;
+        options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+        // options.SameSite = SameSiteMode.None,
+        // Secure = true,
     });
 
 // MICROSOFT AUTHENTICATION
