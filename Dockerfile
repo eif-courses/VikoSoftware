@@ -21,5 +21,4 @@ FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
 # Add this line to include your SQLite database file
-COPY StudyPlanner/applicationdatabase.db /app/
 ENTRYPOINT ["dotnet", "StudyPlanner.dll"]
