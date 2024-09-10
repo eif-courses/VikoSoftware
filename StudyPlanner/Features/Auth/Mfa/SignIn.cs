@@ -1,24 +1,13 @@
-﻿using System.Security.Claims;
-using FastEndpoints;
-using FastEndpoints.Security;
+﻿using FastEndpoints;
 using Microsoft.AspNetCore.Identity;
 using StudyPlanner.Data;
 
-namespace StudyPlanner.Features.Auth;
+namespace StudyPlanner.Features.Auth.Mfa;
 
-public sealed record SignInRequest(string Email, string Password);
+internal sealed record SignInRequest(string Email, string Password);
 
-internal sealed class SignIn : Endpoint<SignInRequest>
+internal sealed class SignIn(UserManager<ApplicationUser> userManager) : Endpoint<SignInRequest>
 {
-    private readonly UserManager<ApplicationUser> _userManager;
-    private readonly SignInManager<ApplicationUser> _signInManager;
-
-    public SignIn(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager)
-    {
-        _userManager = userManager;
-        _signInManager = signInManager;
-    }
-
     public override void Configure()
     {
         Post("/auth/mfa/signin");
@@ -27,45 +16,39 @@ internal sealed class SignIn : Endpoint<SignInRequest>
 
     public override async Task HandleAsync(SignInRequest req, CancellationToken ct)
     {
-        var user = await _userManager.FindByEmailAsync(req.Email);
-        if (user == null || !await _userManager.CheckPasswordAsync(user, req.Password))
+        var user = await userManager.FindByEmailAsync(req.Email);
+        if (user == null || !await userManager.CheckPasswordAsync(user, req.Password))
         {
             await SendUnauthorizedAsync(ct);
             return;
         }
 
         // Check if 2FA is enabled for this user
-        if (await _userManager.GetTwoFactorEnabledAsync(user))
+        if (!await userManager.GetTwoFactorEnabledAsync(user))
         {
-            // Indicate that 2FA is required and send a temporary 2FA token
-            // You can return a response with a 2FA-required status
-            await SendAsync(new { message = "2FA required", userId = user.Id }, statusCode: 200, ct);
-            return;
+            // Generate the QR code URL to set up 2FA
+            var authenticatorKey = await userManager.GetAuthenticatorKeyAsync(user);
+            if (string.IsNullOrEmpty(authenticatorKey))
+            {
+                await userManager.ResetAuthenticatorKeyAsync(user); // Reset key if needed
+                authenticatorKey = await userManager.GetAuthenticatorKeyAsync(user);
+            }
+
+            // Generate the QR code URL
+            var qrCodeUrl = $"otpauth://totp/VikoSoftware:{Uri.EscapeDataString(user.Email)}?secret={authenticatorKey}&issuer=VikoSoftware&digits=6";
+            
+            // Return the QR code URL to the frontend
+            await SendAsync(new 
+            { 
+                message = "2FA setup required", 
+                qrCodeUrl, 
+                userId = user.Id 
+            }, statusCode: 200, ct);
         }
-
-        // No 2FA required, sign in the user with cookies
-        await SignInUser(user);
-        await SendOkAsync(ct);
-    }
-
-    private async Task SignInUser(ApplicationUser user)
-    {
-        // Get user roles and create claims
-        var roles = await _userManager.GetRolesAsync(user);
-        var claims = new List<Claim>
+        else
         {
-            new Claim(ClaimTypes.Name, user.UserName),
-            new Claim(ClaimTypes.Email, user.Email),
-            new Claim(ClaimTypes.NameIdentifier, user.Id)
-        };
-
-        claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
-
-        // Create and sign in the user using cookie authentication
-        await CookieAuth.SignInAsync(u =>
-        {
-            u.Claims.AddRange(claims);
-            u.Roles.AddRange(roles);
-        });
+            // If 2FA is already enabled, notify that 2FA is required
+            await SendAsync(new { message = "2FA required", userId = user.Id }, statusCode: 200, ct);
+        }
     }
 }

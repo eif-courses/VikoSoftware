@@ -8,26 +8,17 @@ namespace StudyPlanner.Features.Auth.MFA;
 
 internal sealed record Verify2FaRequest(string UserId, string VerificationCode);
 
-internal sealed class Verify2Fa : Endpoint<Verify2FaRequest>
+internal sealed class Verify2Fa(UserManager<ApplicationUser> userManager) : Endpoint<Verify2FaRequest>
 {
-    private readonly UserManager<ApplicationUser> _userManager;
-    private readonly SignInManager<ApplicationUser> _signInManager;
-
-    public Verify2Fa(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager)
-    {
-        _userManager = userManager;
-        _signInManager = signInManager;
-    }
-
     public override void Configure()
     {
-        Post("/auth/verify-2fa");
+        Post("/auth/mfa/verify-2fa");
         AllowAnonymous();
     }
 
     public override async Task HandleAsync(Verify2FaRequest req, CancellationToken ct)
     {
-        var user = await _userManager.FindByIdAsync(req.UserId);
+        var user = await userManager.FindByIdAsync(req.UserId);
         if (user == null)
         {
             await SendUnauthorizedAsync(ct);
@@ -35,13 +26,24 @@ internal sealed class Verify2Fa : Endpoint<Verify2FaRequest>
         }
 
         // Verify the 2FA code
-        var isTokenValid = await _userManager.VerifyTwoFactorTokenAsync(user, TokenOptions.DefaultAuthenticatorProvider, req.VerificationCode);
+        var isTokenValid = await userManager.VerifyTwoFactorTokenAsync(user, TokenOptions.DefaultAuthenticatorProvider, req.VerificationCode);
         if (!isTokenValid)
         {
             await SendUnauthorizedAsync(ct);
             return;
         }
-
+        
+        // Enable 2FA if not already enabled
+        if (!await userManager.GetTwoFactorEnabledAsync(user))
+        {
+            var enable2FaResult = await userManager.SetTwoFactorEnabledAsync(user, true);
+            if (!enable2FaResult.Succeeded)
+            {
+                await SendAsync(new { message = "Failed to enable 2FA" }, statusCode: 500, ct);
+                return;
+            }
+        }
+        
         // Complete the sign-in process
         await SignInUser(user);
         await SendOkAsync(ct);
@@ -50,7 +52,7 @@ internal sealed class Verify2Fa : Endpoint<Verify2FaRequest>
     private async Task SignInUser(ApplicationUser user)
     {
         // Get user roles and create claims
-        var roles = await _userManager.GetRolesAsync(user);
+        var roles = await userManager.GetRolesAsync(user);
         var claims = new List<Claim>
         {
             new Claim(ClaimTypes.Name, user.UserName),
