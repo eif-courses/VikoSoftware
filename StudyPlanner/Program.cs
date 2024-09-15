@@ -28,6 +28,7 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders(); // Optional, if you still need token providers for things like email confirmation
 
+
 // LOCAL AUTHENTICATION FAST ENDPOINTS SECURITY PACKAGE
 // COokie test dev only disable cross domains SameSite
 //         options.Cookie.SecurePolicy = CookieSecurePolicy.None; ALSO NEED CHANGE
@@ -43,44 +44,20 @@ builder.Services.AddAuthenticationCookie(validFor: TimeSpan.FromMinutes(30),
     });
 
 // MICROSOFT AUTHENTICATION
-builder.Services.AddAuthentication().AddMicrosoftIdentityWebApi(builder.Configuration.GetSection("AzureAd"));
-
-builder.Services.AddAuthentication(options =>
-{
-    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-
-}).AddJwtBearer(options =>
+builder.Services.AddAuthentication()
+    .AddJwtBearer("LocalJwtBearer", options =>
     {
         var jwtSettings = builder.Configuration.GetSection("Authentication:Jwt");
+
         options.TokenValidationParameters = new TokenValidationParameters
         {
-            // Specify the key used to sign the token
-            IssuerSigningKey =
-                new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["SecretKey"])),
-
-            // Ensure the token is issued by a valid authority
-            ValidateIssuer = true,
-            ValidIssuer = jwtSettings["Authority"],
-
-
-            // Ensure the token is issued for a valid audience
-            ValidateAudience = true,
-            ValidAudience = jwtSettings["Audience"],
-
-            // Ensure the token is not expired
-            ValidateLifetime = true,
-
-            // Optional: Ensure the token's signature is valid
             ValidateIssuerSigningKey = true,
-
-            // Optional: Set clock skew to account for clock differences between the issuer and server
-            ClockSkew = TimeSpan.Zero
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["SecretKey"])),
+            ValidateIssuer = false,//jwtSettings["Authority"].ToString(),
+            ValidateAudience = false,//jwtSettings["Audience"],
         };
-    }
-
-);
-
+    })
+    .AddMicrosoftIdentityWebApi(builder.Configuration.GetSection("AzureAd"));
 
 builder.Services.AddAuthorization();
 
